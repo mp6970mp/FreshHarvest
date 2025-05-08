@@ -1,67 +1,123 @@
-import { useState } from "react";
-import { Clock, MapPin, Plus, X, Edit, Calendar, Save } from "lucide-react";
+import React, { useState } from "react";
+import { Clock, MapPin, Plus, X, Edit, Save, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 
-// Event type definition
+// Event type definition from database
 interface Event {
   id: number;
   title: string;
   description: string;
-  date: { month: string; day: string };
+  month: string;
+  day: string;
   time: string;
   location: string;
   color: string;
+  createdAt?: string;
 }
-
-// Demo events data - in a real application, this would come from a database
-const initialEvents: Event[] = [
-  {
-    id: 1,
-    title: "Farmers Market Saturday",
-    description: "Meet local farmers and sample fresh, seasonal produce in our parking lot market.",
-    date: { month: "OCT", day: "15" },
-    time: "10:00 AM - 2:00 PM",
-    location: "Store Parking Lot",
-    color: "primary"
-  },
-  {
-    id: 2,
-    title: "Wine & Cheese Tasting",
-    description: "Sample our finest selection of wines paired with artisanal cheeses.",
-    date: { month: "OCT", day: "22" },
-    time: "4:00 PM - 6:00 PM",
-    location: "Deli Department",
-    color: "secondary"
-  },
-  {
-    id: 3,
-    title: "Fall Harvest Festival",
-    description: "Family-friendly event with pumpkin decorating, apple cider, and seasonal treats.",
-    date: { month: "OCT", day: "29" },
-    time: "12:00 PM - 3:00 PM",
-    location: "Throughout Store",
-    color: "accent"
-  }
-];
 
 const EventManager = () => {
   const { toast } = useToast();
-  const [events, setEvents] = useState<Event[]>(initialEvents);
   const [isAddingEvent, setIsAddingEvent] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   
   // New event form state
-  const [newEvent, setNewEvent] = useState<Omit<Event, "id">>({
+  const [newEvent, setNewEvent] = useState<Omit<Event, "id" | "createdAt">>({
     title: "",
     description: "",
-    date: { month: "", day: "" },
+    month: "",
+    day: "",
     time: "",
     location: "",
     color: "primary"
+  });
+  
+  // Fetch events from the API
+  const { data: events = [], isLoading } = useQuery({ 
+    queryKey: ['/api/events'],
+    queryFn: getQueryFn({ on401: "returnNull" })
+  });
+  
+  // Create event mutation
+  const createEventMutation = useMutation({
+    mutationFn: async (eventData: Omit<Event, "id" | "createdAt">) => {
+      return await apiRequest('/api/events', {
+        method: 'POST',
+        body: JSON.stringify(eventData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/events'] });
+      toast({
+        title: "Event created",
+        description: "Your event has been added successfully",
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem creating your event",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Update event mutation
+  const updateEventMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Omit<Event, "id" | "createdAt"> }) => {
+      return await apiRequest(`/api/events/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/events'] });
+      toast({
+        title: "Event updated",
+        description: "Your event has been updated successfully",
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Error updating event:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem updating your event",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Delete event mutation
+  const deleteEventMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/events/${id}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/events'] });
+      toast({
+        title: "Event deleted",
+        description: "Your event has been deleted successfully",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting event:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem deleting your event",
+        variant: "destructive",
+      });
+    }
   });
 
   const colorOptions = [
@@ -72,27 +128,16 @@ const EventManager = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-    if (name === "month" || name === "day") {
-      setNewEvent(prev => ({
-        ...prev,
-        date: {
-          ...prev.date,
-          [name]: value
-        }
-      }));
-    } else {
-      setNewEvent(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    setNewEvent(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleAddEvent = () => {
     // Validate form
-    if (!newEvent.title || !newEvent.description || !newEvent.date.month || 
-        !newEvent.date.day || !newEvent.time || !newEvent.location) {
+    if (!newEvent.title || !newEvent.description || !newEvent.month || 
+        !newEvent.day || !newEvent.time || !newEvent.location) {
       toast({
         title: "Missing information",
         description: "Please fill in all the fields",
@@ -101,33 +146,8 @@ const EventManager = () => {
       return;
     }
 
-    // Create new event with unique ID
-    const newId = Math.max(0, ...events.map(e => e.id)) + 1;
-    
-    // Add to events
-    const eventToAdd = {
-      ...newEvent,
-      id: newId
-    };
-    
-    setEvents([...events, eventToAdd]);
-    
-    // Reset form
-    setNewEvent({
-      title: "",
-      description: "",
-      date: { month: "", day: "" },
-      time: "",
-      location: "",
-      color: "primary"
-    });
-    
-    setIsAddingEvent(false);
-    
-    toast({
-      title: "Event added",
-      description: "Your event has been added successfully"
-    });
+    // Create the event
+    createEventMutation.mutate(newEvent);
   };
 
   const startEditEvent = (event: Event) => {
@@ -135,7 +155,8 @@ const EventManager = () => {
     setNewEvent({
       title: event.title,
       description: event.description,
-      date: { ...event.date },
+      month: event.month,
+      day: event.day,
       time: event.time,
       location: event.location,
       color: event.color
@@ -146,8 +167,8 @@ const EventManager = () => {
     if (!editingEventId) return;
     
     // Validate form
-    if (!newEvent.title || !newEvent.description || !newEvent.date.month || 
-        !newEvent.date.day || !newEvent.time || !newEvent.location) {
+    if (!newEvent.title || !newEvent.description || !newEvent.month || 
+        !newEvent.day || !newEvent.time || !newEvent.location) {
       toast({
         title: "Missing information",
         description: "Please fill in all the fields",
@@ -156,47 +177,27 @@ const EventManager = () => {
       return;
     }
     
-    // Update event
-    const updatedEvents = events.map(event => 
-      event.id === editingEventId ? { ...newEvent, id: event.id } : event
-    );
-    
-    setEvents(updatedEvents);
-    setEditingEventId(null);
-    
-    // Reset form
-    setNewEvent({
-      title: "",
-      description: "",
-      date: { month: "", day: "" },
-      time: "",
-      location: "",
-      color: "primary"
-    });
-    
-    toast({
-      title: "Event updated",
-      description: "Your event has been updated successfully"
+    // Update the event
+    updateEventMutation.mutate({ 
+      id: editingEventId, 
+      data: newEvent 
     });
   };
 
   const handleDeleteEvent = (id: number) => {
-    const updatedEvents = events.filter(event => event.id !== id);
-    setEvents(updatedEvents);
-    
-    toast({
-      title: "Event deleted",
-      description: "Your event has been removed"
-    });
+    if (confirm("Are you sure you want to delete this event?")) {
+      deleteEventMutation.mutate(id);
+    }
   };
 
-  const cancelEditOrAdd = () => {
+  const resetForm = () => {
     setIsAddingEvent(false);
     setEditingEventId(null);
     setNewEvent({
       title: "",
       description: "",
-      date: { month: "", day: "" },
+      month: "",
+      day: "",
       time: "",
       location: "",
       color: "primary"
@@ -217,6 +218,14 @@ const EventManager = () => {
         </Button>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="animate-spin mr-2" size={24} />
+          <span>Loading events...</span>
+        </div>
+      )}
+
       {/* Event Form (Add/Edit) */}
       {(isAddingEvent || editingEventId !== null) && (
         <div className="mb-8 bg-gray-50 p-6 rounded-lg shadow-md">
@@ -224,7 +233,7 @@ const EventManager = () => {
             <h2 className="text-2xl font-bold">
               {editingEventId !== null ? "Edit Event" : "Add New Event"}
             </h2>
-            <Button variant="ghost" onClick={cancelEditOrAdd}>
+            <Button variant="ghost" onClick={resetForm}>
               <X size={18} />
             </Button>
           </div>
@@ -247,7 +256,7 @@ const EventManager = () => {
                 <Input
                   id="month"
                   name="month"
-                  value={newEvent.date.month}
+                  value={newEvent.month}
                   onChange={handleInputChange}
                   placeholder="e.g. OCT"
                   maxLength={3}
@@ -258,7 +267,7 @@ const EventManager = () => {
                 <Input
                   id="day"
                   name="day"
-                  value={newEvent.date.day}
+                  value={newEvent.day}
                   onChange={handleInputChange}
                   placeholder="e.g. 15"
                   maxLength={2}
@@ -335,77 +344,93 @@ const EventManager = () => {
           <Button 
             onClick={editingEventId !== null ? handleUpdateEvent : handleAddEvent}
             className="bg-primary text-white"
+            disabled={createEventMutation.isPending || updateEventMutation.isPending}
           >
-            <Save className="mr-2" size={16} />
-            {editingEventId !== null ? "Update Event" : "Save Event"}
+            {(createEventMutation.isPending || updateEventMutation.isPending) ? (
+              <>
+                <Loader2 className="mr-2 animate-spin" size={16} />
+                {editingEventId !== null ? "Updating..." : "Saving..."}
+              </>
+            ) : (
+              <>
+                <Save className="mr-2" size={16} />
+                {editingEventId !== null ? "Update Event" : "Save Event"}
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && events.length === 0 && !isAddingEvent && !editingEventId && (
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <h3 className="text-xl mb-2">No Events Yet</h3>
+          <p className="text-gray-500 mb-4">Add your first event to get started</p>
+          <Button 
+            onClick={() => setIsAddingEvent(true)}
+            className="bg-primary text-white"
+          >
+            <Plus className="mr-2" size={16} />
+            Add Event
           </Button>
         </div>
       )}
 
       {/* Events List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map(event => (
-          <div 
-            key={event.id} 
-            className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100"
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`bg-${event.color} text-white text-center py-2 px-4 rounded ${event.color === 'accent' ? 'text-gray-800' : ''}`}>
-                  <span className="block text-sm">{event.date.month}</span>
-                  <span className="block text-2xl font-bold">{event.date.day}</span>
+      {!isLoading && events.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map((event: Event) => (
+            <div 
+              key={event.id} 
+              className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`bg-${event.color} text-white text-center py-2 px-4 rounded ${event.color === 'accent' ? 'text-gray-800' : ''}`}>
+                    <span className="block text-sm">{event.month}</span>
+                    <span className="block text-2xl font-bold">{event.day}</span>
+                  </div>
+                  <span className="text-gray-500 flex items-center">
+                    <Clock size={16} className="mr-2" />
+                    {event.time}
+                  </span>
                 </div>
-                <span className="text-gray-500 flex items-center">
-                  <Clock size={16} className="mr-2" />
-                  {event.time}
-                </span>
-              </div>
-              <h3 className="font-heading font-bold text-xl mb-2">{event.title}</h3>
-              <p className="text-gray-600 mb-4">{event.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500 flex items-center">
-                  <MapPin size={16} className="mr-1" />
-                  {event.location}
-                </span>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => startEditEvent(event)}
-                    disabled={isAddingEvent || editingEventId !== null}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleDeleteEvent(event.id)}
-                    className="text-destructive hover:text-destructive"
-                    disabled={isAddingEvent || editingEventId !== null}
-                  >
-                    <X size={16} />
-                  </Button>
+                <h3 className="font-heading font-bold text-xl mb-2">{event.title}</h3>
+                <p className="text-gray-600 mb-4">{event.description}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500 flex items-center">
+                    <MapPin size={16} className="mr-1" />
+                    {event.location}
+                  </span>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => startEditEvent(event)}
+                      disabled={isAddingEvent || editingEventId !== null}
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDeleteEvent(event.id)}
+                      disabled={deleteEventMutation.isPending}
+                    >
+                      {deleteEventMutation.isPending ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={16} />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Instructions */}
-      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-bold text-lg mb-2 flex items-center">
-          <Calendar className="mr-2" size={18} />
-          How to manage events
-        </h3>
-        <ul className="list-disc pl-6 space-y-2 text-gray-600">
-          <li>Use the "Add New Event" button to create new store events</li>
-          <li>Click the edit icon on any event card to modify its details</li>
-          <li>Click the delete icon to remove an event</li>
-          <li>Colors can be customized for each event to categorize them</li>
-          <li>Events will appear on the home page in the "Upcoming Store Events" section</li>
-        </ul>
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
