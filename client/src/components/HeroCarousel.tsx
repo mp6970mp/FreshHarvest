@@ -23,7 +23,7 @@ const carouselData = [
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1593113598332-cd59a0c3a9a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
+    image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
     title: "Serving Our Community",
     description: "Proudly accepting SNAP/EBT and all major payment methods",
     buttonText: "Learn More",
