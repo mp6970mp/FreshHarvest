@@ -117,10 +117,10 @@ const ContactInfo = () => {
               <div className="grid grid-cols-2 gap-2">
                 {storeInfo.hours.map((hour, index) => (
                   <Fragment key={hour.day}>
-                    <div className={`py-2 px-3 rounded ${today === index ? 'bg-primary bg-opacity-10 text-primary' : ''}`}>
+                    <div className={`py-2 px-3 rounded ${today === index ? 'bg-primary text-white' : ''}`}>
                       <span className="font-medium">{hour.day}</span>
                     </div>
-                    <div className="py-2 px-3 rounded">
+                    <div className={`py-2 px-3 rounded ${today === index ? 'bg-primary text-white' : ''}`}>
                       {hour.hours}
                     </div>
                   </Fragment>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
+import Logo from "./Logo";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,6 +27,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center">
+            <div className="mr-2">
+              <Logo />
+            </div>
             <span className="text-primary font-heading font-bold text-2xl">Adams Shore</span>
             <span className="text-secondary font-heading font-bold text-2xl ml-1">Supermarket</span>
           </Link>

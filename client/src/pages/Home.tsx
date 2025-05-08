@@ -6,6 +6,7 @@ import StoreEvents from "@/components/StoreEvents";
 import ContactInfo from "@/components/ContactInfo";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
+import PaymentMethods from "@/components/PaymentMethods";
 import { Helmet } from "react-helmet";
 
 const Home = () => {
@@ -21,6 +22,7 @@ const Home = () => {
       <AboutUs />
       <StoreEvents />
       <Testimonials />
+      <PaymentMethods />
       <ContactInfo />
       <Newsletter />
     </>
