@@ -3,8 +3,13 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertEventSchema } from "@shared/schema";
 import { z } from "zod";
+import { requireAdmin, adminLogin, adminLogout, adminStatus } from "./auth";
+import cookieParser from "cookie-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Add cookie parser middleware
+  app.use(cookieParser());
+
   // API route for contact form submissions
   app.post('/api/contact', async (req, res) => {
     try {
@@ -47,8 +52,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin authentication routes
+  app.post('/api/admin/login', adminLogin);
+  app.post('/api/admin/logout', adminLogout);
+  app.get('/api/admin/status', adminStatus);
+
   // Event API Routes
-  // Get all events
+  // Get all events - public route
   app.get('/api/events', async (req, res) => {
     try {
       const events = await storage.getEvents();
@@ -59,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get a single event
+  // Get a single event - public route
   app.get('/api/events/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -76,8 +86,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create a new event
-  app.post('/api/events', async (req, res) => {
+  // Create a new event - admin only
+  app.post('/api/events', requireAdmin, async (req, res) => {
     try {
       // Parse and validate the request body using our schema
       const result = insertEventSchema.safeParse(req.body);
@@ -99,8 +109,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update an existing event
-  app.put('/api/events/:id', async (req, res) => {
+  // Update an existing event - admin only
+  app.put('/api/events/:id', requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       
@@ -130,8 +140,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete an event
-  app.delete('/api/events/:id', async (req, res) => {
+  // Delete an event - admin only
+  app.delete('/api/events/:id', requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       

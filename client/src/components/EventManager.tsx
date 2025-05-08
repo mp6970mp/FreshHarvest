@@ -47,10 +47,7 @@ const EventManager = () => {
   // Create event mutation
   const createEventMutation = useMutation({
     mutationFn: async (eventData: Omit<Event, "id" | "createdAt">) => {
-      return await apiRequest('/api/events', {
-        method: 'POST',
-        body: JSON.stringify(eventData),
-      });
+      return await apiRequest('POST', '/api/events', eventData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
@@ -73,10 +70,7 @@ const EventManager = () => {
   // Update event mutation
   const updateEventMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Omit<Event, "id" | "createdAt"> }) => {
-      return await apiRequest(`/api/events/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('PUT', `/api/events/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
@@ -99,9 +93,7 @@ const EventManager = () => {
   // Delete event mutation
   const deleteEventMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/events/${id}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest('DELETE', `/api/events/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/events'] });
