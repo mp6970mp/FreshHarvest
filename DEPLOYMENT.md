@@ -94,31 +94,69 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
 ### Step 1: Push Your Code to GitHub
 
-Create a GitHub repository and push your code to it.
+Create a GitHub repository and push your code to it. Make sure to include all the build configuration files:
+- netlify.toml
+- netlify-build.sh
+- netlify.js
+- .nvmrc
 
-### Step 2: Connect to Netlify
+### Step 2: Fix Build Command Issues (Required)
+
+Before connecting to Netlify, make a few critical changes to ensure the build succeeds:
+
+1. Add build scripts to package.json as detailed in PACKAGE_UPDATE_INSTRUCTIONS.md
+2. Ensure all build tools are in your package.json:
+   ```bash
+   npm install --save-dev vite esbuild tsx
+   ```
+3. Make sure the netlify-build.sh script is executable:
+   ```bash
+   git update-index --chmod=+x netlify-build.sh
+   ```
+
+### Step 3: Connect to Netlify
 
 1. Log in to [Netlify](https://app.netlify.com/)
 2. Click "New site from Git"
 3. Select GitHub and authorize Netlify
 4. Choose your repository
-5. Keep the build settings as:
-   - Build command: `npm run build`
+5. Keep the build settings as configured in netlify.toml:
+   - Build command: `./netlify-build.sh`
    - Publish directory: `dist`
 
-### Step 3: Configure Environment Variables
+### Step 4: Configure Environment Variables
 
 In Netlify site settings, go to "Environment variables" and add:
 - `NODE_ENV` = `production`
-- `DATABASE_URL` = Your PostgreSQL connection string (use Neon Database or similar Postgres provider that works with serverless functions)
+- `DATABASE_URL` = Your PostgreSQL connection string
+- `NPM_FLAGS` = `--legacy-peer-deps`
 
-### Step 4: Deploy Additional Settings
+For PostgreSQL, use a provider that works with serverless functions:
+- [Neon](https://neon.tech) (recommended for serverless)
+- [Supabase](https://supabase.com)
+- [Railway](https://railway.app)
 
-Netlify will automatically use the netlify.toml file in your repository for configuration.
+### Step 5: Additional Build Settings
 
-### Step 5: Trigger Deployment
+In Netlify site settings:
+1. Go to Build & deploy > Continuous Deployment
+2. Under "Build environment variables", add:
+   - Key: `CI` Value: `false` (This prevents treating warnings as errors)
+
+### Step 6: Trigger Deployment
 
 Either push a new commit to your repository or manually trigger a deployment from the Netlify dashboard.
+
+### Step 7: Troubleshooting Build Issues
+
+If the build still fails:
+1. Check build logs for specific errors
+2. Try setting NODE_VERSION to 20 in environment variables
+3. Consider using the Netlify CLI for local testing:
+   ```bash
+   npm install -g netlify-cli
+   netlify deploy --build
+   ```
 
 ## Database Considerations
 
