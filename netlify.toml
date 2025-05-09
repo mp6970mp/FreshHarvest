@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = "dist/client"
+  publish = "dist"
   functions = "netlify/functions"
 
 [dev]
@@ -8,11 +8,34 @@
   port = 5000
   targetPort = 5000
 
+# For CORS support with cookies
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept"
+    Access-Control-Allow-Credentials = "true"
+
+# API routes
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+  force = true
 
+# Admin routes
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+
+# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"

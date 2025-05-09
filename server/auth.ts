@@ -56,7 +56,8 @@ export function adminLogin(req: Request, res: Response) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 1000, // 1 hour
-    sameSite: "strict"
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/"
   });
 
   res.status(200).json({ message: "Admin login successful" });
@@ -70,7 +71,12 @@ export function adminLogout(req: Request, res: Response) {
     delete adminSessions[sessionId];
   }
   
-  res.clearCookie("adminSession");
+  res.clearCookie("adminSession", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/"
+  });
   res.status(200).json({ message: "Admin logout successful" });
 }
 

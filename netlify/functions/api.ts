@@ -7,10 +7,32 @@ import { requireAdmin, adminLogin, adminLogout, adminStatus } from '../../server
 
 const app = express();
 
+// Set NODE_ENV to production for the serverless function
+process.env.NODE_ENV = 'production';
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// CORS configuration for Netlify Functions
+app.use((req, res, next) => {
+  // Get the origin from the request
+  const origin = req.headers.origin;
+  
+  // Allow the specific origin or any in development
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
 
 // API Routes
 // Contact form submissions
