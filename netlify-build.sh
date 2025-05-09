@@ -1,5 +1,5 @@
 #!/bin/bash
-
+chmod +x netlify-build.sh
 # Create a .npmrc file to specify npm to use legacy peer dependencies to avoid dependency conflicts
 echo "legacy-peer-deps=true" > .npmrc
 
