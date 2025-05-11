@@ -1,5 +1,5 @@
 [build]
-  command = "chmod +x ./netlify-build.sh && ./netlify-build.sh"
+  command = "./netlify-build.sh"
   publish = "dist"
   functions = "netlify/functions"
 
