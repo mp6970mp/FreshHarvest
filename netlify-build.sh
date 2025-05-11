@@ -1,4 +1,11 @@
 #!/bin/bash
+# Ensure Node.js is installed
+if ! command -v node &> /dev/null; then
+  echo "Node.js not found. Installing Node.js..."
+  curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+  apt-get install -y nodejs
+fi
+
 # Create a .npmrc file to specify npm to use legacy peer dependencies to avoid dependency conflicts
 echo "legacy-peer-deps=true" > .npmrc
 
