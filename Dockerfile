@@ -1,59 +1,38 @@
-# Build stage for client
-FROM node:20-alpine AS client-builder
+# Build stage
+FROM node:20-alpine AS builder
 
-WORKDIR /app/client
+WORKDIR /app
 
-# Copy client package files
-COPY client/package*.json ./
-
-# Install client dependencies
+# Copy package files
+COPY package*.json ./
 RUN npm ci
 
-# Copy client source code
-COPY client/ ./
+# Copy source files
+COPY . .
 
-# Build client
-RUN npm run build
-
-# Build stage for server
-FROM node:20-alpine AS server-builder
-
-WORKDIR /app/server
-
-# Copy server package files
-COPY server/package*.json ./
-
-# Install server dependencies
-RUN npm ci
-
-# Copy server source code
-COPY server/ ./
-
-# Build server
-RUN npm run build
+# Build the application
+RUN npm run build && \
+    echo "=== Build Complete ===" && \
+    echo "=== Contents of dist directory ===" && \
+    ls -la dist/
 
 # Production stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install production dependencies for server
-COPY --from=server-builder /app/server/package*.json ./
-RUN npm ci --only=production
+# Install serve globally
+RUN npm install -g serve
 
-# Copy built server files
-COPY --from=server-builder /app/server/dist ./dist
-COPY --from=server-builder /app/server/data ./data
-
-# Copy built client files
-COPY --from=client-builder /app/client/dist ./public
+# Copy built assets from builder stage
+COPY --from=builder /app/dist ./dist
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=5001
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5001
 
-# Start the server
-CMD ["node", "dist/server.js"] 
+# Start the application using serve
+CMD ["serve", "-s", "dist", "-l", "5001"] 
