@@ -1,0 +1,46 @@
+{
+  "title": "Visit Us",
+  "subtitle": "Find our location and store hours below. We look forward to serving you!",
+  "contactInfo": {
+    "address": "123 Adams Shore Road, Quincy, MA 02169",
+    "phone": "(617) 555-0123",
+    "email": "info@adamsshore.com"
+  },
+  "storeHours": [
+    {
+      "day": "Monday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Tuesday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Wednesday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Thursday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Friday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Saturday",
+      "hours": "7:00 AM - 10:00 PM"
+    },
+    {
+      "day": "Sunday",
+      "hours": "8:00 AM - 10:00 PM"
+    }
+  ],
+  "socialMedia": {
+    "instagram": "https://instagram.com/adamsshore",
+    "facebook": "https://facebook.com/adamsshore",
+    "twitter": "https://twitter.com/adamsshore",
+    "youtube": "https://youtube.com/adamsshore"
+  },
+  "mapEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2952.5246260063707!2d-70.99748728834696!3d42.276548179192086!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e37d10a8bb8d25%3A0x56f4c77e32e7775e!2sAdams%20Shore%20Supermarket!5e0!3m2!1sen!2sus!4v1653341869304!5m2!1sen!2sus"
+} 

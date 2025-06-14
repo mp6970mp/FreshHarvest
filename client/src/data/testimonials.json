@@ -1,0 +1,25 @@
+{
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Sarah Johnson",
+      "title": "Quincy Resident",
+      "content": "The produce at Adams Shore is always so fresh! I love that they source from local farms. The staff is always helpful and friendly too.",
+      "rating": 5
+    },
+    {
+      "id": 2,
+      "name": "Michael Chen",
+      "title": "Loyal Customer",
+      "content": "Best neighborhood grocery store around! They always have everything I need and the prices are reasonable. Their bakery section is amazing!",
+      "rating": 5
+    },
+    {
+      "id": 3,
+      "name": "Lisa Rodriguez",
+      "title": "Weekly Shopper",
+      "content": "I appreciate that they accept SNAP/EBT. Makes shopping for my family so much easier. The quality of meat and produce is consistently good.",
+      "rating": 4.5
+    }
+  ]
+} 

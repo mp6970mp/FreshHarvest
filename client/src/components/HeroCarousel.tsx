@@ -1,46 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
-
-const carouselData = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
-    title: "Fresh Produce Daily",
-    description: "Handpicked fruits and vegetables sourced from local farms",
-    buttonText: "Explore Our Products",
-    buttonLink: "#products",
-    buttonVariant: "primary"
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1568254183919-78a4f43a2877?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
-    title: "Well-Stocked Shelves",
-    description: "Find everything you need for your family",
-    buttonText: "Visit Us Today",
-    buttonLink: "#contact",
-    buttonVariant: "secondary"
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
-    title: "Serving Our Community",
-    description: "Proudly accepting SNAP/EBT and all major payment methods",
-    buttonText: "Learn More",
-    buttonLink: "#about",
-    buttonVariant: "accent"
-  }
-];
+import { contentService, CarouselSlide } from "@/services/contentService";
 
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<CarouselSlide[]>([]);
   
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % carouselData.length);
+  useEffect(() => {
+    setSlides(contentService.getCarouselSlides());
   }, []);
   
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
+  
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + carouselData.length) % carouselData.length);
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const goToSlide = (index: number) => {
@@ -55,10 +31,12 @@ const HeroCarousel = () => {
     return () => clearInterval(interval);
   }, [nextSlide]);
 
+  if (slides.length === 0) return null;
+
   return (
     <section id="home" className="relative bg-gray-100 h-96 sm:h-[500px] md:h-[600px] overflow-hidden">
       <div className="relative w-full h-full">
-        {carouselData.map((slide, index) => (
+        {slides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
@@ -106,7 +84,7 @@ const HeroCarousel = () => {
 
         {/* Carousel indicators */}
         <div className="absolute bottom-5 left-0 right-0 flex justify-center space-x-2 z-20">
-          {carouselData.map((_, index) => (
+          {slides.map((_, index) => (
             <button
               key={index}
               className={`w-3 h-3 rounded-full ${

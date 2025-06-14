@@ -1,0 +1,31 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "image": "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
+      "title": "Fresh Produce Daily",
+      "description": "Handpicked fruits and vegetables sourced from local farms",
+      "buttonText": "Explore Our Products",
+      "buttonLink": "#products",
+      "buttonVariant": "primary"
+    },
+    {
+      "id": 2,
+      "image": "https://images.unsplash.com/photo-1568254183919-78a4f43a2877?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
+      "title": "Well-Stocked Shelves",
+      "description": "Find everything you need for your family",
+      "buttonText": "Visit Us Today",
+      "buttonLink": "#contact",
+      "buttonVariant": "secondary"
+    },
+    {
+      "id": 3,
+      "image": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80",
+      "title": "Serving Our Community",
+      "description": "Proudly accepting SNAP/EBT and all major payment methods",
+      "buttonText": "Learn More",
+      "buttonLink": "#about",
+      "buttonVariant": "accent"
+    }
+  ]
+} 

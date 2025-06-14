@@ -1,0 +1,23 @@
+{
+  "image": "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&h=900&q=80",
+  "title": "About Adams Shore Supermarket",
+  "description": [
+    "For over 20 years, Adams Shore Supermarket has been proudly serving the Quincy community with fresh, high-quality groceries at competitive prices.",
+    "Our family-owned supermarket is committed to providing exceptional customer service and supporting local farmers and producers. We carefully select our products to ensure you get the best quality food for your family.",
+    "We're more than just a grocery store – we're a vital part of the neighborhood where community members gather and connect."
+  ],
+  "features": [
+    {
+      "icon": "Check",
+      "text": "Quality Products"
+    },
+    {
+      "icon": "Users",
+      "text": "Community Focused"
+    },
+    {
+      "icon": "MapPin",
+      "text": "Locally Owned"
+    }
+  ]
+} 

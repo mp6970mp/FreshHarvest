@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,29 +10,8 @@ const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-
-  // Check if already logged in
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      try {
-        const response = await fetch("/api/admin/status");
-        const data = await response.json();
-        
-        if (data.isAdmin) {
-          setLocation("/admin");
-        }
-      } catch (error) {
-        console.error("Error checking admin status:", error);
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-    
-    checkAdminStatus();
-  }, [setLocation]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,25 +28,18 @@ const AdminLogin = () => {
     setLoading(true);
     
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
-      });
-      
-      if (response.ok) {
+      // Simple local authentication
+      if (username === "admin" && password === "adams123") {
+        localStorage.setItem("isAdmin", "true");
         toast({
           title: "Login successful",
           description: "You are now logged in as an administrator"
         });
         setLocation("/admin");
       } else {
-        const error = await response.json();
         toast({
           title: "Login failed",
-          description: error.message || "Invalid username or password",
+          description: "Invalid username or password",
           variant: "destructive"
         });
       }
@@ -82,14 +54,6 @@ const AdminLogin = () => {
       setLoading(false);
     }
   };
-
-  if (checkingAuth) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -152,7 +116,6 @@ const AdminLogin = () => {
         
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>Use the admin credentials provided by your system administrator</p>
-          {/* For demonstration purposes only - remove in production */}
           <p className="mt-2 text-xs text-gray-500">For demonstration: username: admin, password: adams123</p>
         </div>
       </div>

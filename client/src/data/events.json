@@ -1,0 +1,73 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Summer Sale",
+      "description": "Join us for our biggest summer sale with discounts up to 50% off on selected items!",
+      "month": "JUL",
+      "day": "15",
+      "time": "9:00 AM - 8:00 PM",
+      "location": "Main Store",
+      "color": "primary"
+    },
+    {
+      "id": 2,
+      "title": "Fresh Produce Day",
+      "description": "Special showcase of locally sourced fruits and vegetables. Meet our local farmers and get the freshest produce!",
+      "month": "JUL",
+      "day": "22",
+      "time": "10:00 AM - 4:00 PM",
+      "location": "Produce Section",
+      "color": "secondary"
+    },
+    {
+      "id": 3,
+      "title": "Back to School Savings",
+      "description": "Stock up on school supplies and lunch items with our special back-to-school discounts. Free backpack with purchase over $50!",
+      "month": "AUG",
+      "day": "5",
+      "time": "8:00 AM - 9:00 PM",
+      "location": "Main Store",
+      "color": "accent"
+    },
+    {
+      "id": 4,
+      "title": "Community Food Drive",
+      "description": "Help us support our local community. Donate non-perishable items and receive a 10% discount on your next purchase.",
+      "month": "AUG",
+      "day": "12",
+      "time": "9:00 AM - 6:00 PM",
+      "location": "Store Entrance",
+      "color": "primary"
+    },
+    {
+      "id": 5,
+      "title": "Cooking Demo: Summer Recipes",
+      "description": "Learn to make quick and healthy summer meals with our in-store chef. Free samples and recipe cards included!",
+      "month": "AUG",
+      "day": "19",
+      "time": "2:00 PM - 4:00 PM",
+      "location": "Deli Section",
+      "color": "secondary"
+    }
+  ],
+  "storeInfo": {
+    "address": "494 Sea St #55, Quincy, MA 02169",
+    "phone": "(617) 328-8888",
+    "email": "info@adamsshoremark.com",
+    "hours": {
+      "monday": "7:00 AM - 9:00 PM",
+      "tuesday": "7:00 AM - 9:00 PM",
+      "wednesday": "7:00 AM - 9:00 PM",
+      "thursday": "7:00 AM - 9:00 PM",
+      "friday": "7:00 AM - 9:00 PM",
+      "saturday": "7:00 AM - 9:00 PM",
+      "sunday": "7:00 AM - 8:00 PM"
+    },
+    "socialMedia": {
+      "facebook": "https://facebook.com/adamsshoremark",
+      "instagram": "https://instagram.com/adamsshoremark",
+      "twitter": "https://twitter.com/adamsshoremark"
+    }
+  }
+} 
